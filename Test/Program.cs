@@ -20,8 +20,6 @@
 
         private static RenderTexture graphNodesTextures = new (Width / 10 * 4, Height - (Height / 10));
 
-        private static bool isDragging = false;
-
         public static uint Height { get => height; set => height = value; }
 
         public static uint SHeight { get => sHeight; set => sHeight = value; }
@@ -79,7 +77,7 @@
 
             Vector2D[] coords = GetCoords(points);
             Window.Display();
-            while (true)
+            while (window.HasFocus())
             {
                 Window.DispatchEvents();
                 Window.Clear(Color.White);
@@ -91,16 +89,11 @@
                 Node[] graph = BuildGraph(coords);
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
-                    isDragging = true;
                     graph = DragNodes(graph);
                     for (int i = 0; i < graph.Length; i++)
                     {
                         coords[i] = graph[i].Position;
                     }
-                }
-                else
-                {
-                    isDragging = false;
                 }
 
                 Sprite poseLines = DrawGraphLines(graph);

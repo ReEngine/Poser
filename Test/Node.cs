@@ -32,15 +32,12 @@ namespace Test
 
         internal void Move(Vector2D translation)
         {
-            if (this.Children != null)
+            if (this.Parent != null)
             {
-                foreach (Node childNode in this.Children)
-                {
-                    childNode.Move(translation);
-                }
+                double limbLength = (this.Position - this.Parent.Position).Length;
+                this.Position += translation;
+                this.Position = this.Parent.Position + ((this.Position - this.Parent.Position).Normalized * limbLength);
             }
-
-            this.Position += translation;
         }
     }
 }
