@@ -14,11 +14,11 @@
 
         private static uint width = SWidth / ResMult;
         private static uint height = SHeight / ResMult;
-        private static RenderWindow window = new (new VideoMode(SWidth, SHeight), "Pixels");
+        private static RenderWindow window = new(new VideoMode(SWidth, SHeight), "Pixels");
 
-        private static RenderTexture graphLinesTexture = new (Width / 10 * 4, Height - (Height / 10));
+        private static RenderTexture graphLinesTexture = new(Width / 10 * 4, Height - (Height / 10));
 
-        private static RenderTexture graphNodesTextures = new (Width / 10 * 4, Height - (Height / 10));
+        private static RenderTexture graphNodesTextures = new(Width / 10 * 4, Height - (Height / 10));
 
         public static uint Height { get => height; set => height = value; }
 
@@ -98,10 +98,10 @@
 
                 Sprite poseLines = DrawGraphLines(graph);
                 Sprite poseNodes = DrawGraphNodes(graph);
-                poseLines.Position = poseNodes.Position = new (Width / 20, Height / 20);
+                poseLines.Position = poseNodes.Position = new(Width / 20, Height / 20);
                 Window.Draw(poseLines);
                 Window.Draw(poseNodes);
-                poseLines.Position = new ((Width / 2) + (Width / 20), Height / 20);
+                poseLines.Position = new((Width / 2) + (Width / 20), Height / 20);
 
                 Window.Draw(poseLines);
 
@@ -112,12 +112,20 @@
 
         private static Node[] DragNodes(Node[] graph)
         {
-            Vector2D mousePos = new (Mouse.GetPosition(Window).X - (Width / 20), Mouse.GetPosition(Window).Y - (Width / 40));
+            Vector2D mousePos = new(Mouse.GetPosition(Window).X - (Width / 20), Mouse.GetPosition(Window).Y - (Width / 40));
             mousePos /= graphNodesTextures.Size.X;
             int closestId = GetClosestNodeToMouse(graph);
 
-            Vector2D translation = mousePos - graph[closestId].Position;
-            graph[closestId].Move(translation);
+            // double translation = Math.Atan2(graph[closestId].Position.Y - mousePos.Y, graph[closestId].Position.X - mousePos.X);
+            Vector2D a = graph[closestId].Parent.Position - mousePos;
+            Vector2D b = graph[closestId].Parent.Parent.Position - graph[closestId].Parent.Position;
+            double dot = a * b;
+
+            double det = (a.X * b.Y) - (a.Y * b.X);
+
+            double angle = Math.Atan2(det, dot);
+
+            graph[closestId].Move(-angle);
 
             return graph;
         }
@@ -127,7 +135,7 @@
             Vector2D[] result = new Vector2D[dots.Length / 2];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = new (dots[i], dots[i + result.Length]);
+                result[i] = new(dots[i], dots[i + result.Length]);
             }
 
             return result;
@@ -141,103 +149,103 @@
                 switch (i)
                 {
                     case 0:
-                        result[i] = new (null);
+                        result[i] = new(null);
                         break;
                     case 1:
-                        result[i] = new (result[0]);
+                        result[i] = new(result[0]);
                         break;
                     case 2:
-                        result[i] = new (result[1]);
+                        result[i] = new(result[1]);
                         break;
                     case 3:
-                        result[i] = new (result[2]);
+                        result[i] = new(result[2]);
                         break;
                     case 4:
-                        result[i] = new (result[0]);
+                        result[i] = new(result[0]);
                         break;
                     case 5:
-                        result[i] = new (result[4]);
+                        result[i] = new(result[4]);
                         break;
                     case 6:
-                        result[i] = new (result[5]);
+                        result[i] = new(result[5]);
                         break;
                     case 7:
-                        result[i] = new (result[3]);
+                        result[i] = new(result[3]);
                         break;
                     case 8:
-                        result[i] = new (result[6]);
+                        result[i] = new(result[6]);
                         break;
                     case 9:
-                        result[i] = new ();
+                        result[i] = new();
                         break;
                     case 10:
-                        result[i] = new ();
+                        result[i] = new();
                         break;
                     case 11:
-                        result[i] = new ();
+                        result[i] = new(result[0]);
                         break;
                     case 12:
-                        result[i] = new (result[11]);
+                        result[i] = new(result[0]);
                         break;
                     case 13:
-                        result[i] = new (result[11]);
+                        result[i] = new(result[11]);
                         break;
                     case 14:
-                        result[i] = new (result[12]);
+                        result[i] = new(result[12]);
                         break;
                     case 15:
-                        result[i] = new (result[13]);
+                        result[i] = new(result[13]);
                         break;
                     case 16:
-                        result[i] = new (result[14]);
+                        result[i] = new(result[14]);
                         break;
                     case 17:
-                        result[i] = new (result[15]);
+                        result[i] = new(result[15]);
                         break;
                     case 18:
-                        result[i] = new (result[16]);
+                        result[i] = new(result[16]);
                         break;
                     case 19:
-                        result[i] = new (result[15]);
+                        result[i] = new(result[15]);
                         break;
                     case 20:
-                        result[i] = new (result[16]);
+                        result[i] = new(result[16]);
                         break;
                     case 21:
-                        result[i] = new (result[15]);
+                        result[i] = new(result[15]);
                         break;
                     case 22:
-                        result[i] = new (result[16]);
+                        result[i] = new(result[16]);
                         break;
                     case 23:
-                        result[i] = new (result[11]);
+                        result[i] = new(result[0]);
                         break;
                     case 24:
-                        result[i] = new (result[12]);
+                        result[i] = new(result[0]);
                         break;
                     case 25:
-                        result[i] = new (result[23]);
+                        result[i] = new(result[23]);
                         break;
                     case 26:
-                        result[i] = new (result[24]);
+                        result[i] = new(result[24]);
                         break;
                     case 27:
-                        result[i] = new (result[25]);
+                        result[i] = new(result[25]);
                         break;
                     case 28:
-                        result[i] = new (result[26]);
+                        result[i] = new(result[26]);
                         break;
                     case 29:
-                        result[i] = new (result[27]);
+                        result[i] = new(result[27]);
                         break;
                     case 30:
-                        result[i] = new (result[28]);
+                        result[i] = new(result[28]);
                         break;
                     case 31:
-                        result[i] = new (result[27]);
+                        result[i] = new(result[27]);
                         break;
                     case 32:
-                        result[i] = new (result[28]);
+                        result[i] = new(result[28]);
                         break;
                 }
 
@@ -250,12 +258,12 @@
         private static Sprite DrawGraphLines(Node[] nodes)
         {
             graphLinesTexture.Clear(Color.Transparent);
-            Sprite result = new ();
+            Sprite result = new();
             for (int i = 0; i < nodes.Length; i++)
             {
                 if (nodes[i].Parent != null)
                 {
-                    VertexArray line = new (PrimitiveType.Lines, 2);
+                    VertexArray line = new(PrimitiveType.Lines, 2);
                     line[0] = new Vertex(new Vector2f((float)nodes[i].Position.X * graphLinesTexture.Size.X, graphLinesTexture.Size.Y - ((float)nodes[i].Position.Y * graphLinesTexture.Size.X)), Color.Black);
                     line[1] = new Vertex(new Vector2f((float)nodes[i].Parent.Position.X * graphLinesTexture.Size.X, graphLinesTexture.Size.Y - ((float)nodes[i].Parent.Position.Y * graphLinesTexture.Size.X)), Color.Black);
                     graphLinesTexture.Draw(line);
@@ -270,24 +278,40 @@
         {
             graphNodesTextures.Clear(Color.Transparent);
             int closestId = GetClosestNodeToMouse(nodes);
-            Sprite result = new ();
+            Sprite result = new();
+            Font font = new(Test.Properties.Resources.DotGothic16_Regular);
 
             // GraphNodesTextures = new(_Width / 10 * 4, _Height - (_Height / 10));
             for (int i = 0; i < nodes.Length; i++)
             {
-                CircleShape pivot = new (5)
+                CircleShape pivot = new(5)
                 {
                     Position = new Vector2f(((float)nodes[i].Position.X * graphNodesTextures.Size.X) - 5, graphNodesTextures.Size.Y - ((float)nodes[i].Position.Y * graphNodesTextures.Size.X) - 5),
                 };
                 pivot.OutlineThickness = 2;
                 pivot.OutlineColor = Color.Black;
                 graphNodesTextures.Draw(pivot);
+                Text nodeId = new(i.ToString(), font, 15);
+                nodeId.Scale = new(1, -1);
+                nodeId.FillColor = Color.Black;
+                nodeId.Position = new Vector2f((float)nodes[i].Position.X * graphNodesTextures.Size.X, graphNodesTextures.Size.Y - ((float)nodes[i].Position.Y * graphNodesTextures.Size.X));
+                graphNodesTextures.Draw(nodeId);
             }
 
-            CircleShape highlighted = new (5)
+            CircleShape highlighted = new(5)
             {
                 Position = new Vector2f(((float)nodes[closestId].Position.X * graphNodesTextures.Size.X) - 5, graphNodesTextures.Size.Y - ((float)nodes[closestId].Position.Y * graphNodesTextures.Size.X) - 5),
             };
+            if (nodes[closestId].Parent != null)
+            {
+                CircleShape highlightedParent = new(5)
+                {
+                    Position = new Vector2f(((float)nodes[closestId].Parent.Position.X * graphNodesTextures.Size.X) - 5, graphNodesTextures.Size.Y - ((float)nodes[closestId].Parent.Position.Y * graphNodesTextures.Size.X) - 5),
+                };
+                highlightedParent.FillColor = Color.Green;
+                graphNodesTextures.Draw(highlightedParent);
+            }
+
             highlighted.FillColor = Color.Red;
             graphNodesTextures.Draw(highlighted);
             result.Texture = graphNodesTextures.Texture;
@@ -298,7 +322,7 @@
         {
             int closest = 0;
             double distanceToMouseMin = 10000000000;
-            Vector2D mousePos = new (Mouse.GetPosition(Window).X - (Width / 20), Mouse.GetPosition(Window).Y - (Width / 40));
+            Vector2D mousePos = new(Mouse.GetPosition(Window).X - (Width / 20), Mouse.GetPosition(Window).Y - (Width / 40));
             for (int i = 0; i < nodes.Length; i++)
             {
                 double distanceToMouse = (nodes[i].Position - (mousePos / graphNodesTextures.Size.X)).Length;

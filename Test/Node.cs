@@ -30,13 +30,20 @@ namespace Test
 
         public List<Node> Children { get; set; } = new List<Node>();
 
-        internal void Move(Vector2D translation)
+        internal void Move(double translation)
         {
             if (this.Parent != null)
             {
                 double limbLength = (this.Position - this.Parent.Position).Length;
-                this.Position += translation;
-                this.Position = this.Parent.Position + ((this.Position - this.Parent.Position).Normalized * limbLength);
+                if (this.Children != null)
+                {
+                    foreach (Node childnode in this.Children)
+                    {
+                        //     childnode.Move(translation);
+                    }
+                }
+
+                this.Position = this.Parent.Position + new Vector2D(limbLength * Math.Cos(translation), limbLength * Math.Sin(translation));
             }
         }
     }
