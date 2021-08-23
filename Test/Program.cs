@@ -8,6 +8,7 @@
     internal class Program
     {
         private const uint ResMult = 1;
+        private static Font font = new(Properties.Resources.DotGothic16_Regular);
 
         private static uint sWidth = VideoMode.DesktopMode.Width;
         private static uint sHeight = VideoMode.DesktopMode.Height;
@@ -30,12 +31,53 @@
 
         public static RenderWindow Window { get => window; set => window = value; }
 
+        public static Font Font
+        {
+            get => font; set => font = value;
+        }
+
         private static void Main(string[] args)
         {
             if (args is null)
             {
                 throw new ArgumentNullException(nameof(args));
             }
+            double[] origin = new double[]
+            {
+                0.5156606580054994, 0.5389367358015656,
+                0.5494335791381163, 0.5591362968115753,
+                0.505949948896629, 0.49268546704503946,
+                0.48006104341570305, 0.5610029474458118,
+                0.45475960136118304, 0.5225187963671678,
+                0.48529673454152067, 0.6016100326338628,
+                0.34147617237377503, 0.7718396869736165,
+                0.19564083924567913, 0.9414761166195745,
+                0.04992565641975702, 1.0,
+                0.0, 0.9962884428697393,
+                0.014004897634823182, 0.9764423634911831,
+                0.03446538830338202, 0.5339872495718775,
+                0.3774140291135426, 0.49497417697739937,
+                0.3589448926411053, 0.4695446861089617,
+                0.3562402563726819, 0.4623051890155676,
+                0.370826298624516, 0.46873532096438786,
+                0.31165213541840414, 0.14988756958826552,
+                0.13190473930060523, 0.13418044842782434,
+                0.13613800356153594, 0.1252820743633083,
+                0.12319972292448635, 0.12146354265082623,
+                0.14400226774068986, 0.12715668116388912,
+                0.17516830326654556, 0.16888302962577945,
+                0.22200274829946, 0.23887143787429918,
+                0.12882326981007206, 0.3455715676016447,
+                0.02770647553467041, 0.4347774763037112,
+                0.004974932950819164, 0.46155835492959923,
+                0.0, 0.4647668088544966,
+                0.007948972132892985, 0.45728045283189034,
+                0.5331726890890015, 0.5275330412189897,
+                0.7379913608919004, 0.7297902524485291,
+                0.9119670379844514, 0.8981358000333225,
+                0.9308422056162358, 0.9184586339794437,
+                1.0, 0.9724952882169435,
+            };
 
             double[] points = new double[]
             {
@@ -77,36 +119,43 @@
 
             Vector2D[] coords = GetCoords(points);
             Window.Display();
-            while (window.HasFocus())
+            while (true)
             {
                 Window.DispatchEvents();
                 Window.Clear(Color.White);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                if (window.HasFocus())
                 {
-                    Window.Close();
-                }
-
-                Node[] graph = BuildGraph(coords);
-                if (Mouse.IsButtonPressed(Mouse.Button.Left))
-                {
-                    graph = DragNodes(graph);
-                    for (int i = 0; i < graph.Length; i++)
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.F5))
                     {
-                        coords[i] = graph[i].Position;
+                        coords = GetCoords(origin);
                     }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.Escape))
+                    {
+                        Window.Close();
+                    }
+
+                    Node[] graph = BuildGraph(coords);
+                    if (Mouse.IsButtonPressed(Mouse.Button.Left))
+                    {
+                        graph = DragNodes(graph);
+                        for (int i = 0; i < graph.Length; i++)
+                        {
+                            coords[i] = graph[i].Position;
+                        }
+                    }
+
+                    Sprite poseLines = DrawGraphLines(graph);
+                    Sprite poseNodes = DrawGraphNodes(graph);
+                    poseLines.Position = poseNodes.Position = new(Width / 20, Height / 20);
+                    Window.Draw(poseLines);
+                    Window.Draw(poseNodes);
+                    poseLines.Position = new((Width / 2) + (Width / 20), Height / 20);
+
+                    Window.Draw(poseLines);
+
+                    Window.Display();
+                    Window.DispatchEvents();
                 }
-
-                Sprite poseLines = DrawGraphLines(graph);
-                Sprite poseNodes = DrawGraphNodes(graph);
-                poseLines.Position = poseNodes.Position = new(Width / 20, Height / 20);
-                Window.Draw(poseLines);
-                Window.Draw(poseNodes);
-                poseLines.Position = new((Width / 2) + (Width / 20), Height / 20);
-
-                Window.Draw(poseLines);
-
-                Window.Display();
-                Window.DispatchEvents();
             }
         }
 
@@ -116,18 +165,36 @@
             mousePos /= graphNodesTextures.Size.X;
             int closestId = GetClosestNodeToMouse(graph);
 
-            // double translation = Math.Atan2(graph[closestId].Position.Y - mousePos.Y, graph[closestId].Position.X - mousePos.X);
-            Vector2D a = graph[closestId].Parent.Position - mousePos;
-            Vector2D b = graph[closestId].Parent.Parent.Position - graph[closestId].Parent.Position;
+            if (graph[closestId].Parent != null && graph[closestId].Parent.Parent != null)
+            {
+                // double translation = Math.Atan2(graph[closestId].Position.Y - mousePos.Y, graph[closestId].Position.X - mousePos.X);
+                Vector2D a = graph[closestId].Parent.Position - mousePos;
+                Vector2D b = graph[closestId].Parent.Parent.Position - graph[closestId].Parent.Position;
+
+                double angle = GetAngle(a, b);
+
+                double degAngle = angle * 180 / Math.PI;
+
+                Text angleText = new(degAngle.ToString(), Font, 15);
+                angleText.Scale = new(1, 1);
+                angleText.FillColor = Color.Black;
+                angleText.Position = new(10, 10);
+                window.Draw(angleText);
+                graph[closestId].Move(angle);
+
+                // graph[closestId].Move(-angle);
+            }
+
+            return graph;
+        }
+
+        public static double GetAngle(Vector2D a, Vector2D b)
+        {
             double dot = a * b;
 
             double det = (a.X * b.Y) - (a.Y * b.X);
 
-            double angle = Math.Atan2(det, dot);
-
-            graph[closestId].Move(-angle);
-
-            return graph;
+            return Math.Atan2(det, dot);
         }
 
         private static Vector2D[] GetCoords(double[] dots)
@@ -279,7 +346,6 @@
             graphNodesTextures.Clear(Color.Transparent);
             int closestId = GetClosestNodeToMouse(nodes);
             Sprite result = new();
-            Font font = new(Test.Properties.Resources.DotGothic16_Regular);
 
             // GraphNodesTextures = new(_Width / 10 * 4, _Height - (_Height / 10));
             for (int i = 0; i < nodes.Length; i++)
@@ -291,11 +357,22 @@
                 pivot.OutlineThickness = 2;
                 pivot.OutlineColor = Color.Black;
                 graphNodesTextures.Draw(pivot);
-                Text nodeId = new(i.ToString(), font, 15);
+                Text nodeId = new(i.ToString(), Font, 15);
                 nodeId.Scale = new(1, -1);
                 nodeId.FillColor = Color.Black;
                 nodeId.Position = new Vector2f((float)nodes[i].Position.X * graphNodesTextures.Size.X, graphNodesTextures.Size.Y - ((float)nodes[i].Position.Y * graphNodesTextures.Size.X));
-                graphNodesTextures.Draw(nodeId);
+                //graphNodesTextures.Draw(nodeId);
+                if (nodes[i].Parent != null && nodes[i].Parent.Parent != null)
+                {
+                    Vector2D a = nodes[i].Parent.Position - nodes[i].Position;
+                    Vector2D b = nodes[i].Parent.Parent.Position - nodes[i].Parent.Position;
+                    Text angleText = new(Math.Truncate(GetAngle(a, b) * 180 / Math.PI).ToString(), Font, 15);
+                    angleText.Scale = new(1, -1);
+                    angleText.FillColor = Color.Black;
+                    angleText.Position = new Vector2f((float)nodes[i].Parent.Position.X * graphNodesTextures.Size.X, graphNodesTextures.Size.Y - ((float)nodes[i].Parent.Position.Y * graphNodesTextures.Size.X));
+                    angleText.Position -= new Vector2f(-15, 15);
+                    graphNodesTextures.Draw(angleText);
+                }
             }
 
             CircleShape highlighted = new(5)

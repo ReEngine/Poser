@@ -11,3 +11,6 @@ dotnet_diagnostic.SA0001.severity = none
 
 # SA1000: Keywords should be spaced correctly
 dotnet_diagnostic.SA1000.severity = none
+
+# SA1005: Single line comments should begin with single space
+dotnet_diagnostic.SA1005.severity = none

@@ -1,8 +1,4 @@
-﻿// <copyright file="Node.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Test
+﻿namespace Test
 {
     using System;
     using System.Collections.Generic;
@@ -30,21 +26,25 @@ namespace Test
 
         public List<Node> Children { get; set; } = new List<Node>();
 
-        internal void Move(double translation)
+        internal void Move(double angle)
         {
-            if (this.Parent != null)
-            {
-                double limbLength = (this.Position - this.Parent.Position).Length;
-                if (this.Children != null)
-                {
-                    foreach (Node childnode in this.Children)
-                    {
-                        //     childnode.Move(translation);
-                    }
-                }
+            Vector2D a = this.Parent.Position - this.Position;
+            Vector2D b = this.Parent.Parent.Position - this.Parent.Position;
 
-                this.Position = this.Parent.Position + new Vector2D(limbLength * Math.Cos(translation), limbLength * Math.Sin(translation));
+            //angle = angle - Program.GetAngle(a, b);
+
+            double limbLength = (this.Position - this.Parent.Position).Length;
+            if (this.Children != null)
+            {
+                foreach (Node childnode in this.Children)
+                {
+                    // childnode.Move(angle);
+                }
             }
+
+            this.Position = this.Parent.Position + new Vector2D(limbLength * Math.Sin(angle), limbLength * Math.Cos(angle));
+
         }
+
     }
 }
